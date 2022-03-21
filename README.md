@@ -16,6 +16,6 @@ A program that serves as a "mod" for the game jumpking, that uses your cam inord
     - one that presses the spacebar (if you are squatting, even if you are in the left or right side, you don't have to be in the middle)
     - one that releases all the keys. 
 - You can change the size and position of the fields by changing the idle box position and size.
-- When all your settings are ready, click start tracking inorder to start using the program.
+- When all your settings are ready, open jumpking, click start tracking inorder to start using the program.
 - Also shout me out if you can, this makes me motivated to make open source stuff for everyone to use. If you encounter any bugs feel feel to message me on twitter.
 -If you are interested in the code, it's in the first folder.
