@@ -16,16 +16,17 @@ import cv2, queue, threading, time
 import time
 from pynput.keyboard import Key, Controller
 import math
+#import dlib
 device_list = device.getDeviceList()
 index = 0
-
+#detector = dlib.get_frontal_face_detector()
 for name in device_list:
 	print(str(index) + ': ' + name)
 	index += 1
 
 face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
 eye_cascade = cv2.CascadeClassifier('haarcascade_eye_tree_eyeglasses.xml')
-
+#╘smile_cascade = cv2.CascadeClassifier('haarcascade_smile.xml')
 class VideoCapture:
 	def __init__(self, name):
 		self.running = True
@@ -110,7 +111,16 @@ class Worker(QObject):
 				faces = []    
 				tempFaces = numpy.array([])    
 				eyes = numpy.array([])   
-				if( self.ui.checkBox_startTracking.isChecked() ):  
+				if( self.ui.checkBox_startTracking.isChecked() ): 
+					# gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) 
+					# rects = detector(gray, 1)			
+					# for (i, face) in enumerate(rects):
+					# 	print(face)	
+					# 	x = face.left()
+					# 	y = face.top() #could be face.bottom() - not sure
+					# 	w = face.right() - face.left()
+					# 	h = face.bottom() - face.top()						
+					# 	img= cv2.rectangle(img, (x,y), (x+w,y+h), (255, 0, 0), 2)
 					gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 					#tresh = self.ui.spinbox_treshold.value()
 					tresh=4
@@ -121,16 +131,25 @@ class Worker(QObject):
 							if( w>h*1.3 or h>w*1.3):
 								continue
 							cond = self.ui.checkBox_eyes.isChecked()	
-							if(cond):
+							tempgray =gray[y:y+h, x:x+w]
+							# smiles  = smile_cascade.detectMultiScale(tempgray,1.5, 15)
+							# smilefoud=False
+							# if ( len(smiles)>0):
+							# 	smilefoud=True
+							# 	for smile in smiles:
+							# 		(tempx,tempy,tempw,temph) = smile
+							# 		img= cv2.rectangle(img, (tempx+x,tempy+y), (tempx+tempw+x,tempy+temph+y), (255, 255, 255), 2)
+
+							if(cond ):
 								tempgray =gray[y:y+h, x:x+w]
 								height, width = tempgray.shape
 								tempgray = cv2.resize(tempgray, ( int(width/2), int(height/2) ), interpolation = cv2.INTER_AREA)
 								eyes = eye_cascade.detectMultiScale(tempgray)
-								print("eyes ",len(eyes))
-							if(len(eyes)>0 or not cond):
+								#print("eyes ",len(eyes))
+							if( len(eyes)>0 ):
 								faces.append(face)
-								print(faces)
-								print(tempFaces)
+								#print(faces)
+								#print(tempFaces)
 						except:
 							continue
 
@@ -290,7 +309,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 		self.shamelessTwitt = QtWidgets.QPushButton(self.verticalLayoutWidget)
 		self.shamelessTwitt.setText(" Twitter")
 		#self.shamelessTwitt.clicked.connect(lambda: { webbrowser.open('https://twitter.com/ZiedYT')  } )
-		self.shamelessTwitt.setIcon(QtGui.QIcon('twitter.png'))
+		#self.shamelessTwitt.setIcon(QtGui.QIcon('twitter.png'))
 
 		#self.shameless.setAlignment(QtCore.Qt.AlignCenter)
 		#self.shameless.setMaximumHeight(25)
@@ -407,7 +426,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 	def reportProgress(self,ele,faces):
 		#print()
 		self.image=ele
-		self.raw = ele
+		self.raw = ele.copy()
 		self.drawBox()
 		self.trackCommand(faces)
 		self.fitImage()
@@ -441,21 +460,28 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
 		if( not self.checkBox_showBox.isChecked()):
 			return
-		start_point=(self.boxX-self.boxA,self.boxY-self.boxA)
-		end_point=(self.boxX+self.boxA,self.boxY+self.boxA)
-		self.image = cv2.rectangle(self.image, start_point, end_point, (255,0,0), 2)
+
 
 		leftLineStart =  ( self.boxX-self.boxA,0 )
-		leftLineEnd =  ( self.boxX-self.boxA,self.boxY+self.boxA )
+		leftLineEnd =  ( self.boxX-self.boxA,height )
 		self.image = cv2.line(self.image, leftLineStart, leftLineEnd, (255,255,0), 2) #left if self.boxX-self.boxA>X
 
 		rightLineStart =  ( self.boxX+self.boxA,0 )
-		rightLineEnd =  ( self.boxX+self.boxA,self.boxY+self.boxA )
+		rightLineEnd =  ( self.boxX+self.boxA,height )
 		self.image = cv2.line(self.image, rightLineStart, rightLineEnd, (255,255,0), 2) #right if self.boxX+self.boxA<X
 
-		bottomLineStart =  ( 0,self.boxY+self.boxA )
-		bottomLineEnd =  ( width,self.boxY+self.boxA )
-		self.image = cv2.line(self.image, bottomLineStart, bottomLineEnd, (255,255,0), 2) #bot if self.boxY+self.boxA<Y  
+		bottomLineStart1 =  ( 0,self.boxY-self.boxA )
+		bottomLineEnd1 =  ( self.boxX-self.boxA,self.boxY-self.boxA )
+		self.image = cv2.line(self.image, bottomLineStart1, bottomLineEnd1, (255,255,0), 2) #bot if self.boxY+self.boxA<Y  
+
+		bottomLineStart2 =  ( self.boxX+self.boxA,self.boxY-self.boxA )
+		bottomLineEnd2 =  ( width,self.boxY-self.boxA )
+		self.image = cv2.line(self.image, bottomLineStart2, bottomLineEnd2, (255,255,0), 2) #bot if self.boxY+self.boxA<Y  
+
+		start_idle=(self.boxX-self.boxA,0)
+		end_idle=(self.boxX+self.boxA,self.boxY+self.boxA)
+		self.image = cv2.rectangle(self.image, start_idle, end_idle, (255,0,0), 2)
+
 
 		font = cv2.FONT_HERSHEY_SIMPLEX
 		scale=0.04
@@ -505,7 +531,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 					roi_color = self.image[self.centerY-self.boxA:self.centerY+self.boxA, self.centerX-self.boxA:self.centerX+self.boxA]
 
 					if( not self.found  ):
-						print("finding backup eyes")
+						#print("finding backup eyes")
 						gray = cv2.cvtColor(self.raw, cv2.COLOR_BGR2GRAY)
 						roi_color =self.image
 						self.count +=1
@@ -531,7 +557,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 							tempY += ey*2+eh*2							
 					
 					if( len(eyes)>0):
-						print("eyes",len(eyes))
+						#print("eyes",len(eyes))
 						self.centerX=int(tempX/len(eyes))
 						self.centerY= int(tempY/len(eyes))
 						self.found=True
@@ -547,32 +573,43 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 			self.count = 0
 
 
-		if ( self.boxY+self.boxA<self.centerY ):
+
+		if( self.boxX+self.boxA<self.centerX ):
+			if( self.right==False):
+				print("press right")
+				self.right=True
+				self.keyboard.press(Key.right)
+
+		elif( self.right):
+			print("release right")
+			self.right=False
+			self.keyboard.release(Key.right) 
+
+
+		elif( self.boxX-self.boxA>self.centerX ):
+			if( self.left==False):
+				print("press left")
+				self.left=True
+				self.keyboard.press(Key.left)      
+		elif( self.left):
+			print("release left")
+			self.left=False
+			self.keyboard.release(Key.left)         
+
+
+		if( ( (self.left or self.right) and self.boxY-self.boxA<self.centerY ) or ( self.boxY+self.boxA<self.centerY ) ):			
 			if( self.space==False):
 				self.space=True
 				self.keyboard.press(Key.space)
 				print("press space")
-				#keyboard hold space
-		elif( self.space):
+
+		elif(self.space):
 			print("release space")
 			self.keyboard.release(Key.space)
 			self.space=False
 
-		if( self.boxX+self.boxA<self.centerX ):
-			if( self.right==False):
-				self.right=True
-				self.keyboard.press(Key.right)         
-		elif( self.right):
-			self.right=False
-			self.keyboard.release(Key.right)
 
-		if( self.boxX-self.boxA>self.centerX ):
-			if( self.left==False):
-				self.left=True
-				self.keyboard.press(Key.left)      
-		elif( self.left):
-			self.left=False
-			self.keyboard.release(Key.left)         
+
 
 if __name__ == "__main__":
 	import sys
