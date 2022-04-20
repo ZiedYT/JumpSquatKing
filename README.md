@@ -5,7 +5,7 @@ A program that serves as a "mod" for the game jumpking, that uses your cam inord
 ## How To Use It
 - Try to have no light sources behind you visible in the camera.
 - Go to main/JumpSquatKing.exe and run it as administrator
--  ![N|topic](https://i.imgur.com/IC4iEGl.png)
+-  ![N|topic](https://i.imgur.com/lPFAHrZ.png)
 - Use the eyes coordinate for a better detection, make sure that you are close enough for your eyes to be visible. If enabled: 
     - the program only accepts the faces where the eyes are visible, to remove false detections.
     - if no face got detected (eg slighty outside the camera, or not in frontfal view) the program uses the coordinates of the detected eyes if found.
