@@ -15,11 +15,10 @@ A program that serves as a "mod" for the game jumpking, that uses your cam inord
 - Set the pixel count you want to use. This represents the resolution of your camera. 
     - The higher the number, the better the tracking quality is and more computing power is needed. 
     - Use lower numbers if you encounter lag. 
-- Tracking boxes can be shown using the checkbox. There is 4 fields:
-    - one that presses the right arrow(if you are in the left size even if you are squatting)
-    - one that presses the left arrow (if you are in the left size even if you are squatting)
-    - one that presses the spacebar (if you are squatting, even if you are in the left or right side, you don't have to be in the middle)
-    - one that releases all the keys. 
+- Tracking boxes can be shown using the checkbox. There is 6 fields:
+    - ![N|topic](https://i.imgur.com/0IPeXFI.png)
+    - 5 zones that press their associated keys.
+    - idle zone that releases all the keys. 
 - You can change the size and position of the fields by changing the idle box position and size.
 - When all your settings are ready, open jumpking, click start tracking inorder to start using the program.
 - Also shout me out if you can, this makes me motivated to make open source stuff for everyone to use. 
