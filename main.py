@@ -205,6 +205,10 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 		self.checkBox_showBox = QtWidgets.QCheckBox(self.verticalLayoutWidget)
 		self.checkBox_showBox.setObjectName("checkBox_showBox")
 		self.horizontalLayout_checkBoxes.addWidget(self.checkBox_showBox)
+		self.checkBox_showText = QtWidgets.QCheckBox(self.verticalLayoutWidget)
+		self.checkBox_showText.setObjectName("checkBox_showText")
+		self.horizontalLayout_checkBoxes.addWidget(self.checkBox_showText)
+
 		self.checkBox_startTracking = QtWidgets.QCheckBox(self.verticalLayoutWidget)
 		self.checkBox_startTracking.setObjectName("checkBox_startTracking")
 		self.horizontalLayout_checkBoxes.addWidget(self.checkBox_startTracking)
@@ -331,7 +335,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 		self.setWindowTitle(_translate("MainWindow", "Jump(Squat)King"))
 		self.label_usedCam.setText(_translate("MainWindow", "Select camera to use:"))
 		#self.label_ipcam.setText(_translate("MainWindow", "IP cam:"))
-		self.checkBox_showBox.setText(_translate("MainWindow", "Show tracking boxes"))
+		self.checkBox_showBox.setText(_translate("MainWindow", "Boxes"))
+		self.checkBox_showText.setText(_translate("MainWindow", "Text"))
 		self.checkBox_eyes.setText(_translate("MainWindow", "Use eyes position as backup"))
 		self.checkBox_startTracking.setText(_translate("MainWindow", "Start tracking"))
 		self.checkBox_flipImage.setText(_translate("MainWindow", "Flip image"))
@@ -342,6 +347,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 		self.centerX=-1
 		self.centerY=-1
 		self.count = 0
+
+
+
 	def resizeEvent(self, event):
 		print("resize")
 		self.width = event.size().width() 
@@ -424,14 +432,15 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 		self.display.show()
 
 	def drawBox(self):
-		if( not self.checkBox_showBox.isChecked()):
-			return
+
 
 		height, width, channel = self.image.shape
 		self.boxX = (int) (width*self.slider_x.value()/100)
 		self.boxY = (int) (height*self.slider_y.value()/100)
 		self.boxA =(int)  (width*self.sldier_size.value()/100)
 
+		if( not self.checkBox_showBox.isChecked()):
+			return
 		start_point=(self.boxX-self.boxA,self.boxY-self.boxA)
 		end_point=(self.boxX+self.boxA,self.boxY+self.boxA)
 		self.image = cv2.rectangle(self.image, start_point, end_point, (255,0,0), 2)
@@ -453,13 +462,14 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 		fontScale =  scale*min(width,height)/25
 		texts = ['Press Right Arrow','Press Left Arrow','Release All keys','Press Spacebar']
 		coords=[ [int( (width+self.boxX+self.boxA)/2 ),15] ,[int( (self.boxX-self.boxA)/2), 15],[int(width/2),max ( self.boxY-self.boxA-15,15) ],[int(width/2),self.boxY+self.boxA+15] ]
-		for i in [1,0]:
-			for j in [0,1,2,3]:
-				text = texts[j]
-				textsize = cv2.getTextSize(text, font, fontScale, 1)[0]
-				textX = coords[j][0] - int(textsize[0]/2)
-				textY = coords[j][1]
-				cv2.putText(self.image, text, ( textX,textY ) , font, fontScale, (0, 255-255*i, 0), 1+i*3, cv2.LINE_8)
+		if(self.checkBox_showText.isChecked()):
+			for i in [1,0]:
+				for j in [0,1,2,3]:
+					text = texts[j]
+					textsize = cv2.getTextSize(text, font, fontScale, 1)[0]
+					textX = coords[j][0] - int(textsize[0]/2)
+					textY = coords[j][1]
+					cv2.putText(self.image, text, ( textX,textY ) , font, fontScale, (0, 255-255*i, 0), 1+i*3, cv2.LINE_8)
 
 	def trackCommand(self,faces):
 		if(not self.checkBox_startTracking.isChecked() ):
