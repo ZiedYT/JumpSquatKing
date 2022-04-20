@@ -15,7 +15,7 @@ A program that serves as a "mod" for the game jumpking, that uses your cam inord
 - Set the pixel count you want to use. This represents the resolution of your camera. 
     - The higher the number, the better the tracking quality is and more computing power is needed. 
     - Use lower numbers if you encounter lag. 
-- Tracking boxes can be shown using the checkbox. There is 6 fields:
+- Tracking boxes can be shown using the checkbox. There is 6 zones:
     - ![N|topic](https://i.imgur.com/0IPeXFI.png)
     - 5 zones that press their associated keys.
     - idle zone that releases all the keys. 
