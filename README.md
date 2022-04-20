@@ -12,7 +12,9 @@ A program that serves as a "mod" for the game jumpking, that uses your cam inord
     - if no face got detected (eg slighty outside the camera, or not in frontfal view) the program uses the coordinates of the detected eyes if found.
 - Use the flip checkBox to flip the input from the camera.
 - Click the rotate button to rotate the camera.
-- Set the pixel count you want to use. This represents the resolution of your camera. The higher the number, the better the tracking quality is and more computing power is needed. Use lower numbers if you encounter lag. 
+- Set the pixel count you want to use. This represents the resolution of your camera. 
+    - The higher the number, the better the tracking quality is and more computing power is needed. 
+    - Use lower numbers if you encounter lag. 
 - Tracking boxes can be shown using the checkbox. There is 4 fields:
     - one that presses the right arrow(if you are in the left size even if you are squatting)
     - one that presses the left arrow (if you are in the left size even if you are squatting)
