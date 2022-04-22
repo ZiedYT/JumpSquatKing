@@ -3,24 +3,20 @@
 A program that serves as a "mod" for the game jumpking, that uses your cam inorder to play the game
 
 ## How To Use It
-- Try to have no light sources behind you visible in the camera.
 - Go to main/JumpSquatKing.exe and run it as administrator
 - Use the drop down menu to select your camera. You may have to wait if you choose a camera with high resolution.
--  ![N|topic](https://i.imgur.com/WrGmwii.png)
-- Use the eyes position for a better detection, make sure that you are close enough for your eyes to be visible. If enabled: 
-    - the program only accepts the faces where the eyes are visible, to remove false detections.
-    - if no face got detected (eg slighty outside the camera, or not in frontfal view) the program uses the coordinates of the detected eyes if found.
-- Use the flip checkBox to flip the input from the camera.
-- Click the rotate button to rotate the camera.
-- Set the pixel count you want to use. This represents the resolution of your camera. 
-    - The higher the number, the better the tracking quality is and more computing power is needed. 
-    - Use lower numbers if you encounter lag. 
-- Tracking boxes can be shown using the checkbox. There is 6 zones:
-    - ![N|topic](https://i.imgur.com/0IPeXFI.png)
-    - 5 zones that press their associated keys.
-    - idle zone that releases all the keys. 
-- You can change the size and position of the fields by changing the idle box position and size.
-- When all your settings are ready, open jumpking, click start tracking inorder to start using the program.
+-  ![N|topic](https://i.imgur.com/LvifyEP.png)
+- Moving left and right:
+    - Use your position (the red point in the tracker). You can change the location required for the character to move using the left/right line spinboxes.
+    - or use you arm angles. You move to the direction of the raised arm. You can change the angle treshold. (You have to be facing the camera)
+- Jumping:
+    - Squat so that the center (red point) is under the line for the spacebar to be pressed. You can change the line position.
+    - Turn to the direction you want to jump to. The rotation treshold can be changed using the body rotation spinbox.
+    - Standup so that the center is above the line for the spacebar to be released.
+- You can flip and rotate the image and show the lines used for the tracking. 
+- Reduced the quality using the spinbox if you encounter lag.
+- When all your settings are ready, open jumpking, click start tracker inorder to start using the program.
+- (dont forget to click on the game)
 - Also shout me out if you can, this makes me motivated to make open source stuff for everyone to use. 
 - If you encounter any bugs feel feel to message me on twitter.
 - If you are interested in the code, it's in the first folder.
