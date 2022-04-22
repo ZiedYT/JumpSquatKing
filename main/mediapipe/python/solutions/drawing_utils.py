@@ -190,11 +190,12 @@ def draw_landmarks(
       # White circle border
       circle_border_radius = max(drawing_spec.circle_radius + 1,
                                  int(drawing_spec.circle_radius * 1.2))
-      cv2.circle(image, landmark_px, circle_border_radius, WHITE_COLOR,
-                 drawing_spec.thickness)
-      # Fill color into the circle
-      cv2.circle(image, landmark_px, drawing_spec.circle_radius,
-                 drawing_spec.color, drawing_spec.thickness)
+      if( drawing_spec.circle_radius>0 and drawing_spec.thickness>0):
+        cv2.circle(image, landmark_px, circle_border_radius, WHITE_COLOR,
+                   drawing_spec.thickness)
+        # Fill color into the circle
+        cv2.circle(image, landmark_px, drawing_spec.circle_radius,
+                   drawing_spec.color, drawing_spec.thickness)
 
 
 def draw_axis(
