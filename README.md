@@ -2,7 +2,7 @@
 
 A program that serves as a "mod" for the game jumpking, that uses your cam inorder to play the game
 ![](https://s8.gifyu.com/images/VID_20211130_151426.gif)
-
+<img src="https://s8.gifyu.com/images/VID_20211130_151426.giff"/>
 ## How To Use It
 - Go to main/JumpSquatKing.exe and run it as administrator
 - Use the drop down menu to select your camera. You may have to wait if you choose a camera with high resolution.
