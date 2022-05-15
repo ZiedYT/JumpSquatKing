@@ -1,9 +1,6 @@
 # Jump Squat King by ZiedYT
 
 A program that serves as a "mod" for the game jumpking, that uses your cam inorder to play the game
-<video width="320" height="240" controls>
-  <source src="jumpking.mp4" type="video/mp4">
-</video>
 
 ## How To Use It
 - Go to main/JumpSquatKing.exe and run it as administrator
