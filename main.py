@@ -160,7 +160,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.height = 350
         self.device_list = self.get_devices()
         self.camIndex =0
-
+        self.space=False
+        self.right=False
+        self.left=False
 
         self.style = mp_drawing_styles.get_default_pose_landmarks_style()
         empty = DrawingSpec(color=(0, 0, 0), thickness=-1,circle_radius=0)
@@ -294,7 +296,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         #body spinbox
         self.spinbox_body = QtWidgets.QSpinBox(self.verticalLayoutWidget)
         self.spinbox_body.setRange(0,90)
-        self.spinbox_body.setValue(20)
+        self.spinbox_body.setValue(13)
         self.horizontalLayout_3.addWidget(self.spinbox_body)
         self.label_body = QtWidgets.QLabel(self.verticalLayoutWidget)
         self.label_body.setObjectName("label_right")
@@ -520,10 +522,11 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
     def getFacing(self,landmarks, poses):
         facing="front"
         tresh = float(self.spinbox_body.value())/90.0
-        if( landmarks[poses.RIGHT_SHOULDER].z - landmarks[poses.LEFT_SHOULDER].z <-tresh):
+        # print(landmarks[poses.RIGHT_SHOULDER].z - landmarks[poses.LEFT_SHOULDER].z )
+        if( landmarks[poses.RIGHT_SHOULDER].z - landmarks[poses.LEFT_SHOULDER].z <= -tresh):
             facing="right"
 
-        elif( landmarks[poses.RIGHT_SHOULDER].z - landmarks[poses.LEFT_SHOULDER].z >tresh): 
+        elif( landmarks[poses.RIGHT_SHOULDER].z - landmarks[poses.LEFT_SHOULDER].z >= tresh): 
             facing="left"
 
         #print(facing)
@@ -583,29 +586,102 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
 
     def commands(self,oldstate):
+        if(self.isActiveWindow()):
+            return
         #jump
+        # print(self.state)
+        # if(self.state[1]!=oldstate[1]):
+        #     if( self.state[1]=="squat"):
+        #         self.keyboard.press(Key.space)
+        #         if(self.state[0]=="right"):
+        #             self.keyboard.press(Key.right)
+        #         elif(self.state[0]=="left"):
+        #             self.keyboard.press(Key.left)
+        #     else:
+        #         self.keyboard.release(Key.space)
+        #         if(self.state[0]=="right"):
+        #             self.keyboard.release(Key.right)
+        #         elif(self.state[0]=="left"):
+        #             self.keyboard.release(Key.left)	
+
+        # if(self.state[2]!=oldstate[2] and self.state[1]=="upright"):
+        #     if( self.state[2]=="right"):
+        #         self.keyboard.press(Key.right)
+        #     elif( self.state[2]=="left"):
+        #         self.keyboard.press(Key.left)
+        #     else:
+        #         self.keyboard.release(Key.left)	
+        #         self.keyboard.release(Key.right)
+        
+
         if(self.state[1]!=oldstate[1]):
             if( self.state[1]=="squat"):
                 self.keyboard.press(Key.space)
                 if(self.state[0]=="right"):
+                    self.keyboard.release(Key.left)	
                     self.keyboard.press(Key.right)
                 elif(self.state[0]=="left"):
+                    self.keyboard.release(Key.right)
                     self.keyboard.press(Key.left)
             else:
                 self.keyboard.release(Key.space)
-                if(self.state[0]=="right"):
-                    self.keyboard.release(Key.right)
-                elif(self.state[0]=="left"):
-                    self.keyboard.release(Key.left)	
+                self.keyboard.release(Key.right)
+                self.keyboard.release(Key.left)	
 
-        if(self.state[2]!=oldstate[2] and self.state[1]=="upright"):
+        if( self.state[1]=="upright"):
             if( self.state[2]=="right"):
+                self.keyboard.release(Key.left)
                 self.keyboard.press(Key.right)
             elif( self.state[2]=="left"):
+                self.keyboard.release(Key.right)
                 self.keyboard.press(Key.left)
             else:
                 self.keyboard.release(Key.left)	
                 self.keyboard.release(Key.right)
+
+        if(self.state[1]=="upright" ):
+            self.keyboard.release(Key.space)
+      
+        if(  self.state[1]=="upright" and self.state[0]=="front" and self.state[2]=="center" ):
+            self.keyboard.release(Key.right)
+            self.keyboard.release(Key.left)
+
+        # if(self.state[1]=="squat" ):
+        #     if(not self.space):
+        #         self.keyboard.press(Key.space)
+        #         self.space=True
+
+        # if(self.state[1]=="upright" ):
+        #     if(self.space):
+        #         self.keyboard.release(Key.space)
+        #         self.space=False
+
+        # if ( self.state[0] ==  self.state[2]):
+        #     if(self.state[0]=="right"):
+        #         if(not self.right):
+        #             self.keyboard.press(Key.right)
+        #             self.right=True
+
+        #         if(self.left):
+        #             self.keyboard.release(Key.left)
+        #             self.left=False
+
+        #     elif(self.state[0]=="left" ):
+        #         if(not self.left):
+        #             self.keyboard.press(Key.left)
+        #             self.left=True
+        #         if(self.right):
+        #             self.keyboard.release(Key.right)
+        #             self.right=False
+
+        
+        # if(self.state[0]=="center" and self.state[2]=="center" ):
+        #     if(self.right):
+        #         self.keyboard.release(Key.right)
+        #         self.right=False
+        #     if(self.left):
+        #         self.keyboard.release(Key.left)
+        #         self.left=False
 
     def exCommand(self):
         global mp_pose
@@ -617,6 +693,11 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                 self.getHorizontal(self.results.pose_landmarks.landmark,mp_pose.PoseLandmark)
                 self.commands(oldstate)
             
+    def closeEvent(self, event):
+        print("Quit")
+        self.keyboard.release(Key.space)	
+        self.keyboard.release(Key.left)	
+        self.keyboard.release(Key.right)
 
 if __name__ == "__main__":
     import sys
