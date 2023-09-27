@@ -116,36 +116,44 @@ class Worker(QObject):
 
     def done(self):
         self.running=False
+        self.cap.running =False
+        self.cap.close()
         self.finished.emit()
+
     def run(self):
         """Long-running task."""
         while self.running:
             #time.sleep(1)
-            ret, image = self.cap.read()
-            if(not ret):
-                self.running = False
-            if(ret):
-                if( self.ui.checkBox_flipImage.isChecked()):
-                    image = cv2.flip(image, 1)
-                rot = self.ui.rotateIndx
-                for i in range(rot):
-                    image = cv2.rotate(image, cv2.ROTATE_90_COUNTERCLOCKWISE)
+            try:
+                ret, image = self.cap.read()
+                if(not ret):
+                    self.running = False
+                if(ret):
+                    if( self.ui.checkBox_flipImage.isChecked()):
+                        image = cv2.flip(image, 1)
+                    rot = self.ui.rotateIndx
+                    for i in range(rot):
+                        image = cv2.rotate(image, cv2.ROTATE_90_COUNTERCLOCKWISE)
 
-                height, width, channel = image.shape
-                quality = float (self.ui.spinbox_quality.value())/10.0
-                image=cv2.resize(image, ( int(width*quality), int(height*quality) ), interpolation = cv2.INTER_AREA)
+                    height, width, channel = image.shape
+                    quality = float (self.ui.spinbox_quality.value())/10.0
+                    image=cv2.resize(image, ( int(width*quality), int(height*quality) ), interpolation = cv2.INTER_AREA)
 
-                if( self.ui.checkBox_startTracker.isChecked() ): 
-                    image.flags.writeable = False
-                    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-                    results = self.pose.process(image)
-                    # Draw the pose annotation on the image.
-                    image.flags.writeable = True	
-                    self.ui.results=results
-                    image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+                    if( self.ui.checkBox_startTracker.isChecked() ): 
+                        image.flags.writeable = False
+                        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+                        results = self.pose.process(image)
+                        # Draw the pose annotation on the image.
+                        image.flags.writeable = True	
+                        self.ui.results=results
+                        image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
 
-                self.progress.emit(image)
-        self.finished.emit()
+                    self.progress.emit(image)
+            except:
+                pass
+
+        self.done()
+        # self.finished.emit()
         
 
 class Ui_MainWindow(QtWidgets.QMainWindow):
@@ -344,18 +352,19 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         
         # if(self.dropDown_camera.count()>1):
         #     self.ipframe.setHidden(True)
-        self.thread = QThread()    
+        thread = QThread()    
         self.worker = Worker()
         self.worker.changeCap(self.cap,self)
-        self.worker.moveToThread(self.thread)
-        self.thread.started.connect(self.worker.run)
-        self.worker.finished.connect(self.thread.quit)
+        self.worker.moveToThread(thread)
+        thread.started.connect(self.worker.run)
+        self.worker.finished.connect(thread.quit)
         self.worker.finished.connect(self.worker.deleteLater)
-        self.thread.finished.connect(self.thread.deleteLater)
+        thread.finished.connect(thread.deleteLater)
         self.worker.progress.connect(self.reportProgress)
         # Step 6: Start the thread
-        self.thread.start()
-
+        thread.start()
+        self.threads=[]
+        self.threads.append(thread)
     def updateCamList(self):
         devices = self.get_devices()
         if(devices == self.device_list ):
@@ -410,25 +419,27 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                 camIndex = self.dropDown_camera.currentIndex()
 
                 print("2")
-                self.worker.running= False
-                self.worker.done()
-                self.thread.exit()
-                self.thread.terminate()
-                self.thread.wait()
+                try:
+                    self.worker.done()
+                    self.threads[-1].exit()
+                    self.threads[-1].terminate()
+                except:
+                    pass
                 print("2.5")
                 self.cap.close()
                 self.cap = VideoCapture(camIndex)
 
-                self.thread = QThread()    
+                thread = QThread()    
                 self.worker = Worker()
                 self.worker.changeCap(self.cap,self)
-                self.worker.moveToThread(self.thread)
-                self.thread.started.connect(self.worker.run)
-                self.worker.finished.connect(self.thread.quit)
+                self.worker.moveToThread(thread)
+                thread.started.connect(self.worker.run)
+                self.worker.finished.connect(thread.quit)
                 self.worker.finished.connect(self.worker.deleteLater)
-                self.thread.finished.connect(self.thread.deleteLater)
+                thread.finished.connect(thread.deleteLater)
                 self.worker.progress.connect(self.reportProgress)
-                self.thread.start()
+                thread.start()
+                self.threads.append(thread)
                 print("3")
                 # self.ipframe.setHidden(True)
                 print("4")
